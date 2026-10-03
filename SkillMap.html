@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SkillMap — خريطة مهاراتك</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+:root{
+ --bg:#080b12;--panel:#101520;--panel2:#141b28;--line:#243044;--text:#f5f7fb;
+ --muted:#8e9aad;--blue:#5d8cff;--cyan:#42dfc5;--orange:#ffb45c;--red:#ff6d7d;
+}
+*{box-sizing:border-box;margin:0;padding:0} html{scroll-behavior:smooth}
+body{background:radial-gradient(circle at 90% 0%,rgba(93,140,255,.14),transparent 28%),var(--bg);color:var(--text);font-family:Cairo,Arial;min-height:100vh}
+button,select{font:inherit} button{cursor:pointer}
+.container{width:min(1180px,92%);margin:auto}
+.nav{height:74px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:22px;letter-spacing:-1px}.logo b{color:var(--cyan)}
+.nav small{color:var(--muted)}
+.hero{padding:70px 0 45px;display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
+.badge{display:inline-flex;padding:7px 12px;border:1px solid #29405d;background:#101b2b;border-radius:30px;color:#83a9ff;font-size:12px;margin-bottom:18px}
+h1{font-size:clamp(38px,5.5vw,67px);line-height:1.12;letter-spacing:-2px}
+.gradient{background:linear-gradient(90deg,#fff,#6f98ff,#42dfc5);-webkit-background-clip:text;color:transparent}
+.hero p{color:var(--muted);line-height:2;margin:20px 0;max-width:650px}
+.btn{border:0;border-radius:13px;padding:12px 20px;color:#fff;background:var(--panel2);border:1px solid var(--line);transition:.2s}
+.btn:hover{transform:translateY(-2px);border-color:#40536e}.primary{background:linear-gradient(135deg,#557ff0,#4867ca);border:0}
+.hero-card{border:1px solid var(--line);background:linear-gradient(145deg,#111927,#0d121c);border-radius:26px;padding:22px;box-shadow:0 25px 70px rgba(0,0,0,.3)}
+.mini-top{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:20px}
+.mini-score{font-size:52px;font-weight:800}.mini-score span{font-size:16px;color:var(--muted)}
+.progress{height:8px;background:#202b3b;border-radius:20px;overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:20px}
+.mini-list{margin-top:22px;display:grid;gap:11px}.mini-row{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:#0d131d;border:1px solid #1d2939;border-radius:12px;font-size:13px}.dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);display:inline-block;margin-left:8px}
+.section{padding:50px 0}.section-title{margin-bottom:24px}.section-title small{color:var(--cyan);font-size:11px;letter-spacing:1px}.section-title h2{font-size:30px;margin-top:4px}.section-title p{color:var(--muted);font-size:13px}
+.paths{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.path{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:18px 14px;text-align:center;color:#dce3ef;transition:.2s}
+.path:hover{transform:translateY(-4px)}.path.active{border-color:var(--blue);background:#111d33;box-shadow:0 0 0 1px rgba(93,140,255,.2)}
+.path .emoji{font-size:28px;display:block;margin-bottom:7px}.path strong{display:block;font-size:14px;margin-bottom:2px}.path small{color:var(--muted);font-size:11px}
+.dashboard{display:grid;grid-template-columns:280px 1fr;gap:16px}
+.side,.main{border:1px solid var(--line);background:var(--panel);border-radius:22px;padding:20px}
+.profile{padding:10px 5px 20px;border-bottom:1px solid var(--line);margin-bottom:18px}.profile h3{font-size:20px}.profile p{color:var(--muted);font-size:12px}
+.stat{background:#0d131d;border:1px solid #1e2939;border-radius:14px;padding:14px;margin-top:10px}.stat label{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.stat strong{font-size:22px}
+.filter{width:100%;background:#0d131d;color:#fff;border:1px solid var(--line);border-radius:11px;padding:10px;margin-top:18px;outline:none}
+.road-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;gap:15px}.road-head h3{font-size:21px}.road-head span{color:var(--muted);font-size:12px}
+.roadmap{display:grid;gap:12px}
+.skill{position:relative;border:1px solid #233044;background:#0d131d;border-radius:16px;padding:17px 18px;display:grid;grid-template-columns:45px 1fr auto;gap:12px;align-items:center}
+.skill.done{border-color:rgba(66,223,197,.3)}.skill.locked{opacity:.48}
+.skill-num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#182338;color:#9db6ef;font-size:12px;font-weight:bold}
+.skill.done .skill-num{background:rgba(66,223,197,.14);color:var(--cyan)}
+.skill h4{font-size:15px}.skill p{font-size:11px;color:var(--muted);margin-top:2px}.skill .status{font-size:11px;color:var(--muted)}
+.check{width:34px;height:34px;border-radius:10px;border:1px solid #33445d;background:#111a28;color:#fff}.done .check{background:#17483f;border-color:#247e6e;color:var(--cyan)}
+.skill-actions{display:flex;gap:8px;align-items:center}.tiny{padding:7px 9px;border-radius:9px;font-size:11px}
+.note-box{margin-top:20px;background:#0d131d;border:1px solid var(--line);border-radius:16px;padding:16px}.note-box textarea{width:100%;height:75px;resize:none;background:transparent;border:0;outline:0;color:#fff;font-family:inherit;font-size:12px}.note-box button{margin-top:5px}
+.tips{margin-top:14px;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(93,140,255,.11),rgba(66,223,197,.06));border:1px solid #263853;color:#aeb9c9;font-size:12px;line-height:1.9}
+footer{border-top:1px solid var(--line);margin-top:60px;padding:28px 0;color:#687588;font-size:11px;display:flex;justify-content:center;text-align:center}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,30px);opacity:0;background:#fff;color:#090c12;padding:11px 17px;border-radius:12px;font-size:12px;z-index:20;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.paths{grid-template-columns:repeat(3,1fr)}.dashboard{grid-template-columns:1fr}}
+@media(max-width:560px){.paths{grid-template-columns:repeat(2,1fr)}.hero{padding-top:45px}.skill{grid-template-columns:38px 1fr}.skill-actions{grid-column:2}.road-head{align-items:flex-start;flex-direction:column}footer{flex-direction:column;gap:8px}}
+</style>
+</head>
+<body>
+<header class="nav">
+ <div class="container" style="display:flex;width:92%;align-items:center;justify-content:space-between">
+  <div class="logo">Skill<b>Map</b></div><small>BUILD YOUR NEXT LEVEL.</small>
+ </div>
+</header>
+
+<main class="container">
+<section class="hero">
+ <div>
+  <span class="badge">✦ SMART LEARNING ROADMAP</span>
+  <h1>اعرف مكانك.<br><span class="gradient">وابني طريقك.</span></h1>
+  <p>SkillMap بيحوّل رحلة التعلم لخريطة واضحة: اختار المجال، قيّم مهاراتك، وشوف بالضبط إيه اللي خلصته وإيه الخطوة اللي بعدها.</p>
+  <a href="#workspace"><button class="btn primary">ابدأ خريطتك الآن →</button></a>
+ </div>
+ <div class="hero-card">
+   <div class="mini-top"><span>YOUR PROGRESS</span><span id="miniPath">DATA SCIENCE</span></div>
+   <div class="mini-score"><span id="heroPercent">0</span><span>%</span></div>
+   <div class="progress"><i id="heroBar" style="width:0%"></i></div>
+   <div class="mini-list" id="miniList"></div>
+ </div>
+</section>
+
+<section class="section" id="workspace">
+ <div class="section-title"><small>01 — CHOOSE YOUR PATH</small><h2>اختار المجال اللي عايز توصله</h2><p>المهارات والـRoadmap هتتغير تلقائياً تلقائياً.</p></div>
+ <div class="paths">
+  <button class="path active" data-path="ds"><span class="emoji">📊</span><strong>Data Science</strong><small>تحليل وذكاء</small></button>
+  <button class="path" data-path="de"><span class="emoji">⚙️</span><strong>Data Engineering</strong><small>بيانات وأنظمة</small></button>
+  <button class="path" data-path="web"><span class="emoji">🌐</span><strong>Web Dev</strong><small>مواقع وتطبيقات</small></button>
+  <button class="path" data-path="ui"><span class="emoji">🎨</span><strong>UI / UX</strong><small>تصميم وتجربة</small></button>
+  <button class="path" data-path="ai"><span class="emoji">🤖</span><strong>AI / ML</strong><small>نماذج وذكاء</small></button>
+ </div>
+</section>
+
+<section class="section">
+ <div class="section-title"><small>02 — YOUR WORKSPACE</small><h2>لوحة تقدمك</h2></div>
+ <div class="dashboard">
+  <aside class="side">
+   <div class="profile"><h3 id="pathName">Data Science</h3><p id="pathDesc">تحليل البيانات وبناء النماذج.</p></div>
+   <div class="stat"><label>إجمالي المهارات <span>●</span></label><strong id="total">0</strong></div>
+   <div class="stat"><label>تم إتقانها</label><strong id="done">0</strong></div>
+   <div class="stat"><label>نسبة الإنجاز</label><strong id="percent">0%</strong></div>
+   <select class="filter" id="levelFilter">
+    <option value="all">عرض كل المهارات</option><option value="todo">المتبقي فقط</option><option value="done">المكتمل فقط</option>
+   </select>
+   <div class="tips" id="tip">💡 ابدأ بالمهارة الأولى. كل مهارة مكتمل تفتح لك الطريق للخطوة التالية.</div>
+  </aside>
+
+  <div class="main">
+   <div class="road-head"><h3>Learning Roadmap</h3><span id="nextText">ابدأ من أول خطوة</span></div>
+   <div class="roadmap" id="roadmap"></div>
+   <div class="note-box"><textarea id="notes" placeholder="اكتب ملاحظاتك عن رحلة التعلم هنا..."></textarea><button class="btn tiny" onclick="saveNotes()">حفظ الملاحظات</button></div>
+  </div>
+ </div>
+</section>
+</main>
+
+<footer class="container">
+    <!-- <h4>SkillMap — Interactive Learning Roadmap</h4> -->
+    <h4>made by Rawan Husseiny</h4>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const paths={
+ ds:{name:"Data Science",desc:"تحليل البيانات وبناء النماذج.",tip:"📊 ركز على الأساسيات أولاً: Python → Data → Statistics → ML.",skills:[
+  ["Python Fundamentals","المتغيرات، الدوال، OOP والأساسيات."],["NumPy & Pandas","التعامل مع البيانات والجداول والتنظيف."],["Data Visualization","Matplotlib وSeaborn وتحويل البيانات لرسوم مفهومة."],["Statistics","Probability، distributions، correlation وhypothesis testing."],["SQL","الاستعلامات، joins، aggregation وقواعد البيانات."],["Machine Learning","Regression، classification، evaluation وfeature engineering."],["Portfolio Project","مشروع كامل من البيانات الخام إلى النتائج والتوصيات."]]},
+ de:{name:"Data Engineering",desc:"بناء أنظمة البيانات والـpipelines.",tip:"⚙️ أهم حاجة هنا: SQL + Python ثم قواعد البيانات والـpipelines.",skills:[
+  ["Python for Data","Python عملي للملفات، APIs والأتمتة."],["SQL","Queries، joins، indexing وتحسين الاستعلامات."],["Databases","Relational databases وdata modeling."],["ETL / ELT","تصميم pipelines لاستخراج وتحويل وتحميل البيانات."],["Data Warehousing","Star schema، facts، dimensions ومخازن البيانات."],["Cloud Basics","مفاهيم التخزين والحوسبة والخدمات السحابية."],["Pipeline Project","ابني pipeline حقيقية من مصدر بيانات إلى dashboard."]]},
+ web:{name:"Web Development",desc:"بناء مواقع وتطبيقات حديثة.",tip:"🌐 لا تحفظي الكود فقط؛ ابني مشاريع صغيرة بعد كل مرحلة.",skills:[
+  ["HTML","Semantic structure، forms وaccessibility."],["CSS","Layout، Flexbox، Grid وResponsive Design."],["JavaScript","DOM، events، arrays، functions وasync."],["Git & GitHub","Version control وإدارة المشاريع."],["APIs","HTTP، JSON، fetch والتعامل مع البيانات."],["Frontend Framework","مفاهيم components وstate وrouting."],["Full Project","موقع متكامل responsive منشور على الإنترنت."]]},
+ ui:{name:"UI / UX Design",desc:"تصميم واجهات وتجارب مستخدم.",tip:"🎨 ابدأ بالمستخدم قبل الألوان: المشكلة → البحث → الحل → الاختبار.",skills:[
+  ["UX Fundamentals","User needs، problems وuser-centered design."],["User Research","Interviews، surveys وpersonas."],["Information Architecture","تنظيم المحتوى والـuser flows."],["Wireframing","تحويل الأفكار إلى شاشات بسيطة."],["UI Design","Typography، color، spacing وvisual hierarchy."],["Prototyping","بناء prototype تفاعلي واختباره."],["Case Study","Case study كاملة توضح المشكلة والبحث والحل."]]},
+ ai:{name:"AI / Machine Learning",desc:"بناء نماذج الذكاء الاصطناعي.",tip:"🤖 الرياضيات والبيانات أساس قوي قبل الدخول في النماذج المعقدة.",skills:[
+  ["Python","Python والـlibraries الأساسية للتحليل."],["Math for ML","Linear algebra، probability وcalculus basics."],["Data Preparation","Cleaning، preprocessing وfeature engineering."],["Machine Learning","Supervised وunsupervised learning."],["Model Evaluation","Metrics، validation وoverfitting."],["Deep Learning","Neural networks وtraining fundamentals."],["AI Project","مشروع AI كامل مع بيانات وevaluation وواجهة."]]}
+};
+
+let current="ds";
+const state=JSON.parse(localStorage.getItem("skillmap-progress")||"{}");
+const notes=localStorage.getItem("skillmap-notes")||"";
+document.getElementById("notes").value=notes;
+
+function key(){return current}
+function completed(){return state[key()]||[]}
+function render(){
+ const p=paths[current], done=completed(), list=document.getElementById("roadmap");
+ document.getElementById("pathName").textContent=p.name;document.getElementById("pathDesc").textContent=p.desc;
+ document.getElementById("tip").textContent=p.tip;
+ document.getElementById("miniPath").textContent=p.name.toUpperCase();
+ document.getElementById("total").textContent=p.skills.length;
+ document.getElementById("done").textContent=done.length;
+ const pct=Math.round(done.length/p.skills.length*100);
+ document.getElementById("percent").textContent=pct+"%";document.getElementById("heroPercent").textContent=pct;document.getElementById("heroBar").style.width=pct+"%";
+ let next=p.skills.findIndex((_,i)=>!done.includes(i));
+ document.getElementById("nextText").textContent=next<0?"🎉 المسار مكتمل!":"الخطوة التالية: "+p.skills[next][0];
+ list.innerHTML="";
+ const filter=document.getElementById("levelFilter").value;
+ p.skills.forEach((s,i)=>{
+  const isDone=done.includes(i);
+  if(filter==="todo"&&isDone || filter==="done"&&!isDone)return;
+  const locked=i>0&&!done.includes(i-1)&&!isDone;
+  const el=document.createElement("div");el.className="skill "+(isDone?"done ":"")+(locked?"locked":"");
+  el.innerHTML=`<div class="skill-num">${String(i+1).padStart(2,"0")}</div>
+   <div><h4>${s[0]}</h4><p>${s[1]}</p></div>
+   <div class="skill-actions"><span class="status">${isDone?"مكتمل":locked?"مقفول":"متاح"}</span>
+   <button class="check" ${locked?"disabled":""} onclick="toggleSkill(${i})">${isDone?"✓":"○"}</button></div>`;
+  list.appendChild(el);
+ });
+ const mini=document.getElementById("miniList");mini.innerHTML="";
+ p.skills.slice(0,4).forEach((s,i)=>mini.innerHTML+=`<div class="mini-row"><span><i class="dot"></i>${s[0]}</span><span>${done.includes(i)?"✓":"—"}</span></div>`);
+}
+function toggleSkill(i){
+ let arr=completed();
+ if(arr.includes(i))arr=arr.filter(x=>x!==i);else arr=[...arr,i].sort((a,b)=>a-b);
+ state[current]=arr;localStorage.setItem("skillmap-progress",JSON.stringify(state));render();
+ showToast(arr.includes(i)?"تم تسجيل المهارة ✓":"تم إلغاء المهارة");
+}
+function saveNotes(){localStorage.setItem("skillmap-notes",document.getElementById("notes").value);showToast("تم حفظ ملاحظاتك على الجهاز ✓")}
+function showToast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),1800)}
+document.querySelectorAll(".path").forEach(b=>b.onclick=()=>{current=b.dataset.path;document.querySelectorAll(".path").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById("levelFilter").value="all";render();document.getElementById("workspace").scrollIntoView({behavior:"smooth"})});
+document.getElementById("levelFilter").onchange=render;
+render();
+</script>
+</body>
+</html>
